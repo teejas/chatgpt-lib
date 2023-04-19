@@ -3,15 +3,12 @@ import openai
 from colorama import Fore, Back
 from dotenv import load_dotenv
 from lib.data import write_msgs_to_file, read_msgs_from_file
-from lib.chatgpt import ask_chatgpt
+from lib.chatgpt import ask_chatgpt, create_new_system_msg
 
 if __name__ == "__main__":
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    # run loop, taking user input and passing it to ask_chatgpt then pretty printing the ais response
-    messages = [
-        {"role": "system", "content": "You are a research assistant."}
-    ]
+    messages = []
     user_input = input("""
         Would you like to load messages from \"chatlog.txt\"? 
         Please enter Y for yes or anything else for no.\n
@@ -29,5 +26,8 @@ if __name__ == "__main__":
             print(Back.RED + "Exiting...")
             write_msgs_to_file(messages, "chatlog.txt")
             break
-        
-        messages = ask_chatgpt(messages, user_input)
+        if user_input.lower() == "system":
+            system_msg = input(Fore.RED + "Enter a system message: ")
+            messages = create_new_system_msg(messages, system_msg)
+        else:
+            messages = ask_chatgpt(messages, user_input)

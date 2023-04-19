@@ -1,5 +1,6 @@
 import openai
-from colorama import Fore
+from openai.error import APIError, RateLimitError
+from colorama import Fore, Back
 
 def create_new_msg(msgs: list, msg: str, role: str):
     msgs.append({
@@ -24,6 +25,9 @@ def ask_chatgpt(msgs: list, msg: str) -> list:
         messages.append(message)
         print(Fore.GREEN + message.content + "\n")
         return messages
-    except:
-        print("OPENAI API: Error using ChatCompletion")
+    except RateLimitError:
+        print(Back.RED + "Rate limited by OpenAI API. Wait and retry.")
+        pass
+    except APIError:
+        print(Back.RED + "OPENAI API: Error using ChatCompletion")
     return msgs
